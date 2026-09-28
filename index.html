@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111a3c">
+  <meta name="description" content="A clear, beautifully detailed weather dashboard with live forecasts for anywhere.">
+  <title>Atmos — Weather Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#main" aria-label="Atmos home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M21.8 20.8a8 8 0 1 1 3.5-12.2 7.2 7.2 0 0 0-3.5 12.2Z" fill="currentColor"/><path d="M11 23.5h12.4a4.2 4.2 0 0 0 .2-8.4 6.3 6.3 0 0 0-12.2 1.2 3.6 3.6 0 0 0-.4 7.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-name">atmos<span>.</span></span>
+      </a>
+
+      <form class="search-form" id="search-form" role="search">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></svg>
+        <label class="visually-hidden" for="city-search">Search for a city</label>
+        <input id="city-search" name="city" type="search" placeholder="Search a city..." autocomplete="off" required>
+        <button class="search-submit" type="submit">Search</button>
+      </form>
+
+      <nav class="top-actions" aria-label="Dashboard controls">
+        <button class="icon-button location-button" id="location-button" type="button" aria-label="Use my current location" title="Use my current location">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3"/><circle cx="12" cy="12" r="8.2"/></svg>
+        </button>
+        <div class="unit-switch" role="group" aria-label="Temperature units">
+          <button type="button" class="unit-button is-active" data-unit="c" aria-pressed="true">°C</button>
+          <button type="button" class="unit-button" data-unit="f" aria-pressed="false">°F</button>
+        </div>
+        <button class="icon-button theme-button" id="theme-button" type="button" aria-label="Switch to light mode" title="Switch theme">
+          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.6 8.6 0 1 0 12 12Z"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow"><span class="live-dot"></span> YOUR WEATHER, AT A GLANCE</p>
+          <h1>Weather <span>dashboard</span></h1>
+        </div>
+        <time class="current-date" id="current-date"></time>
+      </div>
+
+      <div class="notice-bar" id="demo-notice" role="status">
+        <span class="notice-icon" aria-hidden="true">i</span>
+        <span>Preview mode · Add your OpenWeatherMap API key in <code>script.js</code> for live weather.</span>
+        <button class="notice-dismiss" id="dismiss-notice" type="button" aria-label="Dismiss preview message">×</button>
+      </div>
+
+      <div class="error-message" id="error-message" role="alert" hidden></div>
+
+      <section class="weather-overview" aria-label="Current weather">
+        <article class="current-card glass-panel" id="current-card" aria-live="polite">
+          <div class="current-card-top">
+            <div>
+              <p class="card-kicker">CURRENT WEATHER</p>
+              <h2 id="city-name">San Francisco</h2>
+              <p class="location-label" id="country-name">California, United States</p>
+            </div>
+            <span class="weather-date" id="local-time">--:--</span>
+          </div>
+          <div class="current-weather-main">
+            <div class="temperature-wrap">
+              <p class="temperature" id="current-temperature">--<span>°</span></p>
+              <p class="condition" id="current-condition">Partly cloudy</p>
+            </div>
+            <div class="weather-visual" id="current-icon-wrap" aria-label="Weather icon">
+              <img id="current-icon" src="https://openweathermap.org/img/wn/02d@4x.png" alt="Partly cloudy">
+            </div>
+          </div>
+          <div class="current-card-footer">
+            <div class="feels-summary">
+              <span class="mini-weather-icon" aria-hidden="true">◌</span>
+              <span>Feels like <strong id="feels-like">--°</strong></span>
+            </div>
+            <div class="sun-times">
+              <div class="sun-item">
+                <span class="sun-symbol sunrise" aria-hidden="true">↗</span>
+                <span><small>Sunrise</small><strong id="sunrise">--:--</strong></span>
+              </div>
+              <div class="sun-divider"></div>
+              <div class="sun-item">
+                <span class="sun-symbol sunset" aria-hidden="true">↘</span>
+                <span><small>Sunset</small><strong id="sunset">--:--</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="card-orbit orbit-one" aria-hidden="true"></div>
+          <div class="card-orbit orbit-two" aria-hidden="true"></div>
+        </article>
+
+        <section class="details-section" aria-labelledby="details-heading">
+          <div class="section-heading compact-heading">
+            <div><p class="card-kicker">THE CONDITIONS</p><h2 id="details-heading">Weather details</h2></div>
+          </div>
+          <div class="details-grid">
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon humidity-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5s6.2 6.8 6.2 11.2a6.2 6.2 0 1 1-12.4 0C5.8 10.3 12 3.5 12 3.5Z"/><path d="M9.2 15.5a2.8 2.8 0 0 0 2.8 2.8"/></svg></span><span class="detail-label">Humidity</span></div>
+              <p class="detail-value" id="humidity">--<small>%</small></p><p class="detail-note">Relative humidity</p>
+            </article>
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon wind-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h12a2.5 2.5 0 1 0-2.5-2.5M2 12h17a2.5 2.5 0 1 1-2.5 2.5M4 16h7a2.5 2.5 0 1 1-2.5 2.5"/></svg></span><span class="detail-label">Wind speed</span></div>
+              <p class="detail-value" id="wind-speed">--<small> km/h</small></p><p class="detail-note">Current wind</p>
+            </article>
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon feels-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a3 3 0 0 0-6 0v9.8a5 5 0 1 0 6 0Z"/><path d="M11 11v7"/></svg></span><span class="detail-label">Feels like</span></div>
+              <p class="detail-value" id="detail-feels">--<small>°</small></p><p class="detail-note">Perceived temperature</p>
+            </article>
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon clouds-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 18.5h10a4 4 0 0 0 .2-8 6 6 0 0 0-11.6 1.2 3.5 3.5 0 0 0 1.4 6.8Z"/></svg></span><span class="detail-label">Cloudiness</span></div>
+              <p class="detail-value" id="cloudiness">--<small>%</small></p><p class="detail-note">Cloud cover</p>
+            </article>
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon pressure-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m12 12 4-4M8 16h8"/></svg></span><span class="detail-label">Pressure</span></div>
+              <p class="detail-value" id="pressure">--<small> hPa</small></p><p class="detail-note">Atmospheric pressure</p>
+            </article>
+            <article class="detail-card glass-panel">
+              <div class="detail-top"><span class="detail-icon visibility-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></span><span class="detail-label">Visibility</span></div>
+              <p class="detail-value" id="visibility">--<small> km</small></p><p class="detail-note">Viewing distance</p>
+            </article>
+            <article class="detail-card air-card glass-panel">
+              <div class="detail-top"><span class="detail-icon air-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h9.5a2.5 2.5 0 1 0-2.5-2.5M3 14h14a2.5 2.5 0 1 1-2.5 2.5M3 19h6"/></svg></span><span class="detail-label">Air quality</span></div>
+              <div class="air-row">
+                <p class="detail-value" id="aqi-value">--</p>
+                <span class="aqi-badge" id="aqi-label">--</span>
+              </div>
+              <div class="aqi-track" aria-hidden="true"><div class="aqi-marker" id="aqi-marker"></div></div>
+              <p class="detail-note" id="aqi-note">PM2.5 -- · PM10 -- µg/m³</p>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section class="forecast-section" aria-labelledby="forecast-heading">
+        <div class="section-heading forecast-heading">
+          <div><p class="card-kicker">PLAN AHEAD</p><h2 id="forecast-heading">5-day forecast</h2></div>
+          <span class="forecast-caption">A little outlook goes a long way</span>
+        </div>
+        <div class="forecast-grid" id="forecast-grid" aria-live="polite"></div>
+      </section>
+      <div class="loading-overlay" id="loading-overlay" hidden aria-live="polite" aria-busy="true">
+        <span class="loader"></span><span>Finding your forecast...</span>
+      </div>
+    </main>
+    <footer class="page-footer"><span>ATMOS WEATHER</span><span>Look up. Step out.</span></footer>
+  </div>
+</body>
+</html>
